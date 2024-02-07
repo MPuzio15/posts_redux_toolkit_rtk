@@ -2,16 +2,29 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import {Link} from 'react-router-dom'
 
+import {PostAuthor} from './PostAuthor'
+import {DateComponent} from './DateComponent'
+
 export const PostsList = () => {
   const posts = useSelector(state => state.posts);
 
-  const renderPosts = posts.map(post => {
+  const orderedPosts = posts.slice().sort((a, b) => b.date.localeCompare(a.date))
+
+  const renderPosts = orderedPosts.map(post => {
     const postId = post.id
     return (
       <article className="post-excerpt" key={postId}>
+        <div className='row'>
+          <div>
         <h3>{post.title}</h3>
         <p>{post.content.substring(0, 100)}</p>
-        <Link to={`/posts/${postId}`} className='button muted-button'>View</Link>
+          </div>
+          <DateComponent timeStamp={post.date}/>
+        </div>
+        <div className='row'>
+        <Link to={`/posts/${postId}`} className='button'>View</Link>
+        <PostAuthor userId={post.user} />
+        </div>
       </article>
     )
   })
