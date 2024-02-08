@@ -5,13 +5,12 @@ import { DateComponent } from './DateComponent'
 
 import { PostAuthor } from './PostAuthor'
 import { ReactionButtons } from './ReactionButtons'
+import { selectPostById } from '../../redux/postsSlice'
 
 export const SinglePostPage = ({ match }) => {
   const { postId } = match.params
 
-  const post = useSelector((state) =>
-    state.posts.find((post) => post.id.toString() === postId)
-  )
+  const post = useSelector((state) => selectPostById(state, postId))
 
   if (!post) {
     return (
