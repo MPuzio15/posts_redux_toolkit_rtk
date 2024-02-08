@@ -12,13 +12,11 @@ const PostExcerpts = ({ post }) => {
   return (
     <article className="post-excerpt" key={post.id}>
       <div className="row">
-        <div>
-          <h3>{post.title}</h3>
-          <p>{post.content.substring(0, 100)}</p>
-        </div>
+        <PostAuthor userId={post.user} />
         <DateComponent timeStamp={post.date} />
       </div>
-      <PostAuthor userId={post.user} />
+      <h3>{post.title}</h3>
+      <p>{post.content.substring(0, 100)}</p>
       <div className="row">
         <Link to={`/posts/${post.id}`} className="button muted-button">
           View
