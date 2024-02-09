@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 
 import { worker } from './api/server'
 import { fetchUsers } from './redux/usersSlice'
+import { fetchNotifications } from './redux/notificationsSlice'
 
 // Wrap app rendering so we can wait for the mock API to initialize
 async function start() {
@@ -14,6 +15,7 @@ async function start() {
   await worker.start({ onUnhandledRequest: 'bypass' })
 
   store.dispatch(fetchUsers())
+  store.dispatch(fetchNotifications())
 
   ReactDOM.render(
     <React.StrictMode>
