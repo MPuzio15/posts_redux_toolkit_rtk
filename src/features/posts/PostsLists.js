@@ -1,20 +1,14 @@
-import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 
 import { PostAuthor } from './PostAuthor'
 import { DateComponent } from './DateComponent'
 import { ReactionButtons } from './ReactionButtons'
-import {
-  selectAllPosts,
-  fetchPosts,
-  selectPostIds,
-  selectPostById,
-} from '../../redux/postsSlice'
 import { Spinner } from '../../components/Spinner'
+import { useGetPostsQuery } from '../../api/apiSlice'
+import classnames from 'classnames'
 
-let PostExcerpts = ({ postId }) => {
-  const post = useSelector((state) => selectPostById(state, postId))
+let PostExcerpts = ({ post }) => {
   return (
     <article className="post-excerpt" key={post.id}>
       <div className="row">
@@ -36,29 +30,35 @@ let PostExcerpts = ({ postId }) => {
 PostExcerpts = React.memo(PostExcerpts)
 
 export const PostsList = () => {
-  const dispatch = useDispatch()
-  const posts = useSelector(selectAllPosts)
-  const orderedPostsIds = useSelector(selectPostIds)
+  const {
+    data: posts = [],
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    isFetching,
+  } = useGetPostsQuery()
 
-  const postStatus = useSelector((state) => state.posts.status)
-  const error = useSelector((state) => state.posts.error)
-
-  useEffect(() => {
-    if (postStatus === 'idle') {
-      dispatch(fetchPosts())
-    }
-  }, [postStatus, dispatch])
+  const sortedPosts = useMemo(() => {
+    const newPosts = [...posts]
+    let sortedPosts = newPosts.sort((a, b) => b.date.localeCompare(a.date))
+    return sortedPosts
+  }, [posts])
 
   let content
 
-  if (postStatus === 'loading') {
+  if (isLoading) {
     content = <Spinner text="Loading..." />
-  } else if (postStatus === 'success') {
-    content = orderedPostsIds.map((postId) => (
-      <PostExcerpts key={postId} postId={postId} />
+  } else if (isSuccess) {
+    const renderedPosts = sortedPosts.map((post) => (
+      <PostExcerpts key={post.id} post={post} />
     ))
-  } else if (postStatus === 'error') {
-    content = <div>{error}</div>
+    const containerClassname = classnames('post-container', {
+      disabled: isFetching,
+    })
+    content = <div className={containerClassname}>{renderedPosts}</div>
+  } else if (isError) {
+    content = <div>{error.toString()}</div>
   }
 
   return (
