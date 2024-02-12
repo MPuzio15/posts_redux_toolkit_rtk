@@ -3,22 +3,24 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
-  fetchNotifications,
-  selectAllNotifications,
+  selectNotificationsMetadata,
+  useGetNotificationsQuery,
 } from '../redux/notificationsSlice'
 
 export const Navbar = () => {
   const dispatch = useDispatch()
 
-  const fetchNewNotifications = () => {
-    dispatch(fetchNotifications())
-  }
-  const notifications = useSelector(selectAllNotifications)
-  const numUnreadNotifications = notifications.filter((n) => !n.read).length
+  useGetNotificationsQuery()
+
+  const notificationsMetadata = useSelector(selectNotificationsMetadata)
+  const numUnredNotification = notificationsMetadata.filter(
+    (n) => !n.read
+  ).length
+
   let unreadNotificationsBadge
-  if (numUnreadNotifications > 0) {
+  if (numUnredNotification > 0) {
     unreadNotificationsBadge = (
-      <span className="badge">{numUnreadNotifications}</span>
+      <span className="badge">{numUnredNotification}</span>
     )
   }
 
@@ -33,9 +35,6 @@ export const Navbar = () => {
           <Link to="/notifications">
             Notifications {unreadNotificationsBadge}
           </Link>
-          <button className="button" onClick={fetchNewNotifications}>
-            Refetch notifications
-          </button>
         </div>
       </section>
     </nav>

@@ -4,14 +4,16 @@ import classnames from 'classnames'
 
 import { selectAllUsers } from '../../redux/usersSlice'
 import {
-  selectAllNotifications,
+  useGetNotificationsQuery,
   allNotificationsRead,
+  selectMetadataEntities,
 } from '../../redux/notificationsSlice'
 import { timeAgo } from '../posts/helpers/TimeAgo'
 
 export const NotificationsList = () => {
   const dispatch = useDispatch()
-  const notifications = useSelector(selectAllNotifications)
+  const { data: notifications = [] } = useGetNotificationsQuery()
+  const notificationsMetadata = useSelector(selectMetadataEntities)
   const users = useSelector(selectAllUsers)
 
   useLayoutEffect(() => {
@@ -24,8 +26,11 @@ export const NotificationsList = () => {
     const user = users.find((user) => user.id === notification.user) || {
       name: 'Unknown User',
     }
+
+    const metadata = notificationsMetadata[notification.id]
+
     const notificationClassName = classnames('notification', {
-      new: notification.isNew,
+      new: metadata.isNew,
     })
     return (
       <div key={notification.id} className={notificationClassName}>
